@@ -1,115 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Control de Gastos</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:20px; background:#f4f6f9; }
-    h1 { text-align:center; color:#2c3e50; }
-    .botonera { display:flex; flex-direction:column; gap:12px; margin:20px 0; }
-    button {
-      padding:15px; font-size:18px; border:none; border-radius:10px; cursor:pointer; width:100%; color:white;
-    }
-    .gasto { background:#e74c3c; }
-    .ingreso { background:#27ae60; }
-    .dashboard { background:#2980b9; }
-    #contenido { margin-top:20px; }
-  </style>
+  <script defer src="app.js"></script>
 </head>
 <body>
-  <h1>💰 Control Financiero</h1>
+  <div class="container">
+    <h1>📊 Dashboard</h1>
 
-  <div class="botonera">
-    <button class="gasto" onclick="cargar('gastos')">➖ Registrar Gasto</button>
-    <button class="ingreso" onclick="cargar('ingresos')">➕ Registrar Ingreso</button>
-    <button class="dashboard" onclick="cargar('dashboard')">📊 Ver Dashboard</button>
-  </div>
+    <div id="resumen">
+      <p><strong>Total Gastos (mes):</strong> <span id="totalGastos">0</span></p>
+      <p><strong>Total Ingresos (mes):</strong> <span id="totalIngresos">0</span></p>
+      <p><strong>Balance:</strong> <span id="balance">0</span></p>
+    </div>
 
-  <div id="contenido">
-    <p style="text-align:center; color:#7f8c8d;">Selecciona una opción para empezar</p>
+    <div class="charts">
+      <canvas id="gastosPie"></canvas>
+      <canvas id="ingresosPie"></canvas>
+    </div>
+
+    <div class="menu">
+      <a href="form-gastos.html" class="btn">➕ Registrar Gasto</a>
+      <a href="form-ingresos.html" class="btn">➕ Registrar Ingreso</a>
+    </div>
   </div>
 
   <script>
-    function cargar(formName){
-      google.script.run.withSuccessHandler(function(html){
-        document.getElementById('contenido').innerHTML = html;
-
-        if(formName === 'dashboard'){
-          cargarDashboard();
-        } else {
-          // ejecutar scripts internos de forms
-          let scripts = document.getElementById('contenido').getElementsByTagName('script');
-          for(let i=0;i<scripts.length;i++){
-            eval(scripts[i].innerText);
-          }
-        }
-      }).getFormHtml(formName);
-    }
-
-
-
-function cargarDashboard(){
-  google.script.run.withSuccessHandler(function(datos){
-    // Contenedor del dashboard
-    document.getElementById('contenido').innerHTML = `
-      <h2 style="text-align:center;">📊 Dashboard Financiero</h2>
-      <canvas id="graficoBarras"></canvas>
-      <h3 style="text-align:center; margin-top:20px;">Gastos por Categoría (Mes Actual)</h3>
-      <canvas id="graficoGastos"></canvas>
-      <h3 style="text-align:center; margin-top:20px;">Ingresos por Fuente (Mes Actual)</h3>
-      <canvas id="graficoIngresos"></canvas>
-    `;
-
-    const mesActual = datos.mesActual;
-
-    // === Gráfico de barras ===
-    new Chart(document.getElementById('graficoBarras').getContext('2d'), {
-      type:'bar',
-      data:{
-        labels: datos.meses,
-        datasets:[
-          { label:'Ingresos', data: datos.ingresosMensuales, backgroundColor: datos.meses.map((_,i)=>i===mesActual?'#27ae60':'#2ecc71') },
-          { label:'Gastos', data: datos.gastosMensuales, backgroundColor: datos.meses.map((_,i)=>i===mesActual?'#c0392b':'#e74c3c') }
-        ]
-      },
-      options:{ responsive:true, scales:{ y:{ beginAtZero:true } } }
-    });
-
-    // === Pastel Gastos por categoría (mes actual) ===
-    new Chart(document.getElementById('graficoGastos').getContext('2d'), {
-      type:'pie',
-      data:{
-        labels: Object.keys(datos.gastosPorCategoria),
-        datasets:[{
-          data: Object.values(datos.gastosPorCategoria),
-          backgroundColor:['#e74c3c','#c0392b','#d35400','#f39c12','#f1c40f','#27ae60','#2ecc71','#2980b9','#3498db']
-        }]
-      },
-      options:{ responsive:true }
-    });
-
-    // === Pastel Ingresos por fuente (mes actual) ===
-    new Chart(document.getElementById('graficoIngresos').getContext('2d'), {
-      type:'pie',
-      data:{
-        labels: Object.keys(datos.ingresosPorFuente),
-        datasets:[{
-          data: Object.values(datos.ingresosPorFuente),
-          backgroundColor:['#27ae60','#2ecc71','#16a085','#1abc9c','#2980b9','#3498db']
-        }]
-      },
-      options:{ responsive:true }
-    });
-
-  }).obtenerDashboardData(); // llamada única
-
-  
-}
-
-    // === Cargar dashboard automáticamente al abrir la página ===
-    window.onload = function(){
-      cargarDashboard();
-}
+    document.addEventListener("DOMContentLoaded", cargarDashboard);
   </script>
 </body>
 </html>
