@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwFcAUpSW6bhE5-Pf47SDQ9tPtoxGqGSS3NqqFqlN7FqzRXvoIkZLtALkHl09GOcbY/exec"; // cambia por tu URL
+const API_URL = "https://script.google.com/macros/s/AKfycbzQi7IHYLzAG8OhY-8qZLzjsdwrZ3wKER1c24BpopUG5OO_Pnyoh6crQM0qQwjg4ok/exec"; // cambia por tu URL
 
 // 📊 Cargar Dashboard
 async function cargarDashboard() {
